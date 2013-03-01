@@ -1,6 +1,6 @@
 # Yii Test Cache
 
-This is a module to the test of the cache in the Yii framework
+Test tool of cache data for Yii Framework
 
 ## Usage
 
