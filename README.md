@@ -68,6 +68,39 @@ class FooTest extends CDbTestCase
 }
 ```
 
+## API
+
+### hasKey
+
+```php
+Yii::app()->cache->set('keyname', 'value');
+Yii::app()->cache->hasKey('keyname'); // true
+Yii::app()->cache->hasKey('nothing'); // false
+```
+
+### getExpire
+
+```php
+Yii::app()->cache->set('keyname', 'value', 3600);
+Yii::app()->cache->getExpire('keyname'); // 3600
+
+Yii::app()->cache->set('keyname', 'value');
+Yii::app()->cache->getExpire('keyname'); // 0
+
+Yii::app()->cache->getExpire('nothing'); // null
+```
+
+### getData
+
+```php
+Yii::app()->cache->set('keyname', 'value');
+Yii::app()->cache->getData('keyname');
+// ['value', null]
+// 0 => value, 1 => dependency
+```
+
+see: http://www.yiiframework.com/doc/api/1.1/CCache#set-detail
+
 ## Development
 
 ```
