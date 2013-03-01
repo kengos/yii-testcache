@@ -34,24 +34,36 @@ class Foo extends CActiveRecord
 }
 ```
 
-## In your test code
+### In your test code
 
 ```
 class FooTest extends CDbTestCase
 {
+  public function setUp()
+  {
+    parent::setUp();
+    Yii::app()->cache->flush();
+  }
+
+  public function tearDown()
+  {
+    Yii::app()->cache->clearAll();
+    parent::tearDown();
+  }
+
   public function testBar()
   {
     $foo = new Foo;
     // first
     $this->assertEquals('something', $foo->bar());
-    $this->assertEquals(1, Yii::app()->getProfileData('write'));
-    $this->assertEquals(1, Yii::app()->getProfileData('read'));
+    $this->assertEquals(1, Yii::app()->cache->getProfileData('write'));
+    $this->assertEquals(1, Yii::app()->cache->getProfileData('read'));
 
     // second
     $this->assertEquals('something', $foo->bar());
-    $this->assertEquals(1, Yii::app()->getProfileData('write'));
+    $this->assertEquals(1, Yii::app()->cache->getProfileData('write'));
     // !!! increment profile data 'read' !!!
-    $this->assertEquals(2, Yii::app()->getProfileData('read'));
+    $this->assertEquals(2, Yii::app()->cache->getProfileData('read'));
   }
 }
 ```
