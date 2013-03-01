@@ -36,7 +36,7 @@ class Foo extends CActiveRecord
 
 ### In your test code
 
-```
+```php
 class FooTest extends CDbTestCase
 {
   public function setUp()
