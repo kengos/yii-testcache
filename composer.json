@@ -1,0 +1,27 @@
+{
+  "name": "yii-testcache",
+  "repositories": [
+    {
+      "type":"composer",
+      "url": "http://packages.phundament.com"
+    },
+    {
+      "type": "composer",
+      "url": "http://packagist.org"
+    }
+  ],
+  "config": {
+    "bin-dir": "."
+  },
+  "require": {
+    "php": ">= 5.4.0"
+  },
+  "require-dev": {
+    "yiisoft/yii": "1.1.*",
+    "phpunit/phpunit": "3.7.*",
+    "phpunit/phpunit-selenium": "1.2.12",
+    "phpunit/php-invoker": "1.1.2",
+    "phpunit/dbunit": "1.2.2",
+    "phpunit/phpunit-story": "1.0.1"
+  }
+}
