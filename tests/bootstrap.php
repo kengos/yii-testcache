@@ -10,6 +10,7 @@ require_once(FRAMEWORK_PATH . DS . 'yiit.php');
 
 $config = [
   'basePath' => BASE_PATH . DS . 'src',
+  'runtimePath' => BASE_PATH . DS . 'tests' . DS . 'runtime',
   'components'=>[
     'cache' => [
       'class' => 'application.YiiTestCache',
@@ -18,3 +19,9 @@ $config = [
 ];
 Yii::createWebApplication($config);
 set_error_handler(array('PHPUnit_Util_ErrorHandler', 'handleError'), E_ALL);
+
+function p($data)
+{
+  echo CVarDumper::dumpAsString($data);
+  return $data;
+}

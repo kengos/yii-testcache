@@ -5,42 +5,44 @@ class YiiTestCacheTest extends CTestCase
   public function setUp()
   {
     $this->cache = Yii::app()->cache;
-    $this->cache->init();
+    $this->cache->clearAll();
+    $this->cache->flush();
   }
 
-  /**
-   * @covers YiiTestCache::getCacheSize
-   * @covers YiiTestCache::getExpire
-   * @covers YiiTestCache::setValue
-   */
-  public function testSet()
+  public function tearDown()
+  {
+    $this->cache->clearAll();
+  }
+
+  public function testSetAndGet()
   {
     $this->assertTrue($this->cache->set('foo', 'bar'));
-    $this->assertEquals(1, $this->cache->getCacheSize());
-    $this->assertEquals(0, $this->cache->getExpire('foo'));
-    $this->cache->set('bar', 'baz', 200);
-    $this->assertEquals(2, $this->cache->getCacheSize());
-    $this->assertTrue(time() + 200 >= $this->cache->getExpire('bar'));
-    $this->assertTrue(time() < $this->cache->getExpire('bar'));
+    $this->assertEquals('bar', $this->cache->get('foo'));
+    $this->assertEquals(
+      ['read' => ['foo' => 1], 'write' => ['foo' => 1], 'hit' => ['foo' => 1], 'delete' => []],
+      $this->cache->getProfileData()
+    );
   }
 
   public function testAdd()
   {
-    $this->assertTrue($this->cache->set('foo', 'bar'));
-    $this->assertTrue($this->cache->add('foo', 'baz'));
-    $this->assertEquals('baz', $this->cache->get('foo'));
-
-    $this->assertFalse($this->cache->add('bar', 'baz'));
-    $this->assertEquals(1, count($this->cache->getCacheData()));
-  }
-
-  public function testMget()
-  {
-    $this->assertTrue($this->cache->set('foo', 'bar'));
-    $this->assertTrue($this->cache->set('bar', 'baz'));
+    $this->assertFalse($this->cache->add('foo', 'bar'));
     $this->assertEquals(
-      ['foo' => 'bar', 'bar' => 'baz', 'baz' => false],
-      $this->cache->mget(['foo', 'bar', 'baz'])
+      ['read' => [], 'write' => [], 'hit' => [], 'delete' => []],
+      $this->cache->getProfileData()
+    );
+
+    $this->assertTrue($this->cache->set('foo', 'bar'));
+    $this->assertEquals(
+      ['read' => [], 'write' => ['foo' => 1], 'hit' => [], 'delete' => []],
+      $this->cache->getProfileData()
+    );
+
+    $this->assertTrue($this->cache->add('foo', 'baz'));
+    $this->assertEquals(
+      ['read' => [], 'write' => ['foo' => 2], 'hit' => [], 'delete' => []],
+      $this->cache->getProfileData()
     );
   }
+
 }
