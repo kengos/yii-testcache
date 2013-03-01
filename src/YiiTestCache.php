@@ -10,6 +10,79 @@ class YiiTestCache extends CCache
 
   protected $_storage;
 
+  /**
+   * @return bool 
+   */
+  public function hasKey($key)
+  {
+    $data = $this->getStorage(self::DATA_KEY);
+    return isset($data[$key]);
+  }
+
+  /**
+   * Get Cache data expire
+   * @return int|null
+   */
+  public function getExpire($key)
+  {
+    $data = $this->getStorage(self::DATA_KEY);
+    if(!isset($data[$key]))
+      return null;
+
+    return $data[$key]['expire'];
+  }
+
+  /**
+   * Get Cache data
+   * @return Array|null [0 => cacheValue, 1 => dependency]
+   */
+  public function getData($key)
+  {
+    $data = $this->getStorage(self::DATA_KEY);
+    if(!isset($data[$key]))
+      return null;
+
+    return unserialize($data[$key]['data']);
+  }
+
+  public function getStorage($key = null)
+  {
+    if($this->_storage === null)
+    {
+      $this->_storage = Yii::createComponent($this->storage);
+      $this->_storage->init();
+    }
+    return $key === null ? $this->_storage : $this->_storage->get($key);
+  }
+
+  public function setStorage($key, $value, $expire = 0)
+  {
+    return $this->getStorage()->set($key, $value, $expire);
+  }
+
+  public function getProfileData($storeKey = null)
+  {
+    if($storeKey === null)
+    {
+      return [
+        self::READ_KEY => $this->getStorage(self::READ_KEY),
+        self::WRITE_KEY => $this->getStorage(self::WRITE_KEY),
+        self::HIT_KEY => $this->getStorage(self::HIT_KEY),
+        self::DELETE_KEY => $this->getStorage(self::DELETE_KEY)
+      ];
+    }
+    else if(in_array($storeKey, [self::READ_KEY, self::WRITE_KEY, self::HIT_KEY, self::DELETE_KEY]))
+    {
+      return $this->getStorage($storeKey);
+    }
+    return false;
+  }
+
+  public function clearAll()
+  {
+    return $this->getStorage()->flush();
+  }
+
   protected function getValue($key)
   {
     $this->increment(self::READ_KEY, $key);
@@ -43,7 +116,6 @@ class YiiTestCache extends CCache
       $expire = 0;
 
     $this->increment(self::WRITE_KEY, $key);
-
     $data = $this->getStorage(self::DATA_KEY);
     if($data === false)
       $data = [];
@@ -87,44 +159,6 @@ class YiiTestCache extends CCache
       $this->setStorage($key, []);
     }
     return true;
-  }
-
-  public function getStorage($key = null)
-  {
-    if($this->_storage === null)
-    {
-      $this->_storage = Yii::createComponent($this->storage);
-      $this->_storage->init();
-    }
-    return $key === null ? $this->_storage : $this->_storage->get($key);
-  }
-
-  public function setStorage($key, $value, $expire = 0)
-  {
-    return $this->getStorage()->set($key, $value, $expire);
-  }
-
-  public function getProfileData($storeKey = null)
-  {
-    if($storeKey === null)
-    {
-      return [
-        self::READ_KEY => $this->getStorage(self::READ_KEY),
-        self::WRITE_KEY => $this->getStorage(self::WRITE_KEY),
-        self::HIT_KEY => $this->getStorage(self::HIT_KEY),
-        self::DELETE_KEY => $this->getStorage(self::DELETE_KEY)
-      ];
-    }
-    else if(in_array($storeKey, [self::READ_KEY, self::WRITE_KEY, self::HIT_KEY, self::DELETE_KEY]))
-    {
-      return $this->getStorage($storeKey);
-    }
-    return false;
-  }
-
-  public function clearAll()
-  {
-    return $this->getStorage()->flush();
   }
 
   /**
